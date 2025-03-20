@@ -17,7 +17,7 @@ type PrinterOptions struct {
 // NewOptions creates a new PrinterOptions object with sane defaults.
 func NewOptions() *PrinterOptions {
 	return &PrinterOptions{
-		feed:        5,
+		feed:        40,
 		bestQuality: true,
 		autoRotate:  false,
 		dither:      true,
