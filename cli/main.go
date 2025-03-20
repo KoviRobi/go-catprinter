@@ -43,6 +43,11 @@ var flags = []cli.Flag{
 		Value: 0.5,
 		Usage: "regulate at which point a gray pixel is printed as black",
 	},
+	&cli.IntFlag{
+		Name:  "feed",
+		Value: 40,
+		Usage: "amount of paper to feed",
+	},
 	&cli.BoolFlag{
 		Name:  "debugLog",
 		Usage: "print debugging messages",
@@ -95,6 +100,7 @@ func action(cCtx *cli.Context) error {
 		autoRotate   = cCtx.Bool("autoRotate")
 		dontDither   = cCtx.Bool("dontDither")
 		blackPoint   = cCtx.Float64("blackPoint")
+		feed         = cCtx.Int("feed")
 		debugLog     = cCtx.Bool("debugLog")
 		dumpImage    = cCtx.Bool("dumpImage")
 		dumpRequest  = cCtx.Bool("dumpRequest")
@@ -114,6 +120,7 @@ func action(cCtx *cli.Context) error {
 	c.Debug.DontPrint = dontPrint
 
 	opts := catprinter.NewOptions().
+		SetFeed(feed).
 		SetBestQuality(!lowerQuality).
 		SetDither(!dontDither).
 		SetAutoRotate(autoRotate).

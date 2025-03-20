@@ -164,7 +164,7 @@ func commandPrintRow(imgRow []byte) []byte {
 }
 
 // commandsPrintImg builds the commands to print an image.
-func commandsPrintImg(imgS []byte) []byte {
+func commandsPrintImg(imgS []byte, feed int) []byte {
 
 	img := chunkify(imgS, printWidth)
 	var data []byte
@@ -183,7 +183,7 @@ func commandsPrintImg(imgS []byte) []byte {
 	}
 	data = append(data, cmdLatticeEnd...)
 	data = append(data, cmdFinalSpeed...)
-	data = append(data, commandFeedPaper(5)...)
+	data = append(data, commandFeedPaper(feed)...)
 	data = append(data, cmdSetPaper...)
 	data = append(data, cmdSetPaper...)
 	data = append(data, cmdSetPaper...)
@@ -192,7 +192,7 @@ func commandsPrintImg(imgS []byte) []byte {
 
 }
 
-func weakCommandsPrintImg(imgS []byte) []byte {
+func weakCommandsPrintImg(imgS []byte, feed int) []byte {
 
 	img := chunkify(imgS, printWidth)
 
@@ -201,7 +201,7 @@ func weakCommandsPrintImg(imgS []byte) []byte {
 	for _, row := range img {
 		data = append(data, commandPrintRow(row)...)
 	}
-	data = append(data, commandFeedPaper(5)...)
+	data = append(data, commandFeedPaper(feed)...)
 	data = append(data, cmdSetPaper...)
 	data = append(data, cmdSetPaper...)
 	data = append(data, cmdSetPaper...)

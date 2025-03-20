@@ -81,9 +81,9 @@ func (c *Client) Print(img image.Image, opts *PrinterOptions, isAlreadyFormatted
 		return err
 	}
 	if opts.bestQuality {
-		fmtImg = commandsPrintImg(fmtImg)
+		fmtImg = commandsPrintImg(fmtImg, opts.feed)
 	} else {
-		fmtImg = weakCommandsPrintImg(fmtImg)
+		fmtImg = weakCommandsPrintImg(fmtImg, opts.feed)
 	}
 	if c.Debug.DumpRequest {
 		err = os.WriteFile("./request.bin", fmtImg, 0644)

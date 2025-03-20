@@ -6,6 +6,7 @@ import (
 )
 
 type PrinterOptions struct {
+	feed        int
 	bestQuality bool
 	autoRotate  bool
 	dither      bool
@@ -16,12 +17,19 @@ type PrinterOptions struct {
 // NewOptions creates a new PrinterOptions object with sane defaults.
 func NewOptions() *PrinterOptions {
 	return &PrinterOptions{
+		feed:        5,
 		bestQuality: true,
 		autoRotate:  false,
 		dither:      true,
 		ditherAlgo:  dither.FloydSteinberg,
 		blackPoint:  0.5,
 	}
+}
+
+// Set paper feed after printing. Defaults to 5 lines.
+func (o *PrinterOptions) SetFeed(feed int) *PrinterOptions {
+	o.feed = feed
+	return o
 }
 
 // SetBestQuality sets the quality option. Default is true.
