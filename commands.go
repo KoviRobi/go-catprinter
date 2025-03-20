@@ -44,13 +44,32 @@ func checksum(bArr []byte, i, i2 int) byte {
 	return b2
 }
 
+// commandRetractPaper creates a command to retract paper by a specified amount.
+func commandRetractPaper(howMuch int) []byte {
+
+	bArr := []byte{
+		81,
+		120,
+		160,
+		0,
+		1,
+		0,
+		byte(howMuch & 0xff),
+		0,
+		255,
+	}
+
+	bArr[7] = checksum(bArr, 6, 1)
+	return bArr
+}
+
 // commandFeedPaper creates a command to feed paper by a specified amount.
 func commandFeedPaper(howMuch int) []byte {
 
 	bArr := []byte{
 		81,
 		120,
-		189,
+		161,
 		0,
 		1,
 		0,
@@ -178,6 +197,7 @@ func commandsPrintImg(imgS []byte, feed int) []byte {
 	data = append(data, cmdUpdateDevice...)
 
 	data = append(data, cmdLatticeStart...)
+	data = append(data, commandRetractPaper(feed)...)
 	for _, row := range img {
 		data = append(data, commandPrintRow(row)...)
 	}
@@ -198,6 +218,7 @@ func weakCommandsPrintImg(imgS []byte, feed int) []byte {
 
 	data := append(cmdGetDevState, cmdSetQuality200Dpi...)
 	data = append(data, cmdLatticeStart...)
+	data = append(data, commandRetractPaper(feed)...)
 	for _, row := range img {
 		data = append(data, commandPrintRow(row)...)
 	}
