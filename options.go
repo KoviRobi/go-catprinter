@@ -10,6 +10,7 @@ type PrinterOptions struct {
 	bestQuality bool
 	autoRotate  bool
 	dither      bool
+	fill        bool
 	blackPoint  float32
 	ditherAlgo  dither.ErrorDiffusionMatrix
 }
@@ -21,6 +22,7 @@ func NewOptions() *PrinterOptions {
 		bestQuality: true,
 		autoRotate:  false,
 		dither:      true,
+		fill:        false,
 		ditherAlgo:  dither.FloydSteinberg,
 		blackPoint:  0.5,
 	}
@@ -78,6 +80,15 @@ func (o *PrinterOptions) SetDitherAlgo(algo dither.ErrorDiffusionMatrix) *Printe
 // DitherAlgo returns the dither algorithm.
 func (o *PrinterOptions) DitherAlgo() dither.ErrorDiffusionMatrix {
 	return o.ditherAlgo
+}
+
+func (o *PrinterOptions) SetFill(fill bool) *PrinterOptions {
+	o.fill = fill
+	return o
+}
+
+func (o *PrinterOptions) Fill() bool {
+	return o.fill
 }
 
 // SetBlackPoint sets the black point. Default is 0.5.

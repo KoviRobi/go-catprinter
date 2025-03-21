@@ -81,9 +81,15 @@ func (c *Client) FormatImage(img image.Image, opts *PrinterOptions) image.Image 
 		img = imaging.Rotate90(img)
 	}
 
-	var newImg image.Image = imaging.New(img.Bounds().Dx(), img.Bounds().Dy(), color.White)
-	newImg = imaging.OverlayCenter(newImg, img, 1)
-	newImg = imaging.Resize(newImg, printWidth, 0, imaging.NearestNeighbor)
+	var newImg image.Image
+	if opts.fill {
+		newImg = imaging.New(printWidth, img.Bounds().Dy(), color.White)
+		newImg = imaging.OverlayCenter(newImg, img, 1)
+	} else {
+		newImg = imaging.New(img.Bounds().Dx(), img.Bounds().Dy(), color.White)
+		newImg = imaging.OverlayCenter(newImg, img, 1)
+		newImg = imaging.Resize(newImg, printWidth, 0, imaging.NearestNeighbor)
+	}
 
 	if opts.dither {
 		newImg = ditherImage(newImg, opts.ditherAlgo)

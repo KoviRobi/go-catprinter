@@ -38,6 +38,10 @@ var flags = []cli.Flag{
 		Name:  "dontDither",
 		Usage: "don't dither the image",
 	},
+	&cli.BoolFlag{
+		Name:  "fill",
+		Usage: "fill/crop instead of resize",
+	},
 	&cli.Float64Flag{
 		Name:  "blackPoint",
 		Value: 0.5,
@@ -99,6 +103,7 @@ func action(cCtx *cli.Context) error {
 		lowerQuality = cCtx.Bool("lowerQuality")
 		autoRotate   = cCtx.Bool("autoRotate")
 		dontDither   = cCtx.Bool("dontDither")
+		fill         = cCtx.Bool("fill")
 		blackPoint   = cCtx.Float64("blackPoint")
 		feed         = cCtx.Int("feed")
 		debugLog     = cCtx.Bool("debugLog")
@@ -123,6 +128,7 @@ func action(cCtx *cli.Context) error {
 		SetFeed(feed).
 		SetBestQuality(!lowerQuality).
 		SetDither(!dontDither).
+		SetFill(fill).
 		SetAutoRotate(autoRotate).
 		SetBlackPoint(float32(blackPoint))
 
