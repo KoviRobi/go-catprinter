@@ -142,7 +142,7 @@ func byteEncode(imgRow []byte) []byte {
 	var res []byte
 	for chunkStart := 0; chunkStart < len(imgRow); chunkStart += 8 {
 		var byteVal byte = 0
-		for bitIndex := 0; bitIndex < 8; bitIndex++ {
+		for bitIndex := range 8 {
 			if chunkStart+bitIndex < len(imgRow) && imgRow[chunkStart+bitIndex] != 0 {
 				byteVal |= 1 << uint8(bitIndex)
 			}

@@ -18,8 +18,8 @@ func convertImageToBytes(img image.Image) ([]byte, error) {
 	}
 
 	var byteArray []byte
-	for y := 0; y < img.Bounds().Dy(); y++ {
-		for x := 0; x < img.Bounds().Dx(); x++ {
+	for y := range img.Bounds().Dy() {
+		for x := range img.Bounds().Dx() {
 			r, g, b, _ := img.At(x, y).RGBA()
 			if r != g || g != b || r != b || (r != 0 && r != 65535) {
 				return nil, ErrNotBlackWhite
@@ -42,8 +42,8 @@ func grayscaleToBlackWhite(img image.Image, blackPoint float32) *image.NRGBA {
 	nrgbaImg := image.NewNRGBA(bounds)
 	draw.Draw(nrgbaImg, bounds, img, bounds.Min, draw.Src)
 
-	for y := 0; y < img.Bounds().Dy(); y++ {
-		for x := 0; x < img.Bounds().Dx(); x++ {
+	for y := range img.Bounds().Dy() {
+		for x := range img.Bounds().Dx() {
 			r, g, b, _ := img.At(x, y).RGBA()
 			if r != g || g != b || r != b {
 				log.Panicln("logic error, image should have been grayscale")
