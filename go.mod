@@ -6,6 +6,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/makeworld-the-better-one/dither/v2 v2.4.0
 	github.com/urfave/cli/v2 v2.27.4
+	honnef.co/go/cups v0.0.0-20160111001536-1504d7f5a034
 	tinygo.org/x/bluetooth v0.12.0
 )
 
