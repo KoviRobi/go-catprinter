@@ -7,6 +7,7 @@ require (
 	github.com/go-ble/ble v0.0.0-20240122180141-8c5522f54333
 	github.com/makeworld-the-better-one/dither/v2 v2.4.0
 	github.com/urfave/cli/v2 v2.27.4
+	honnef.co/go/cups v0.0.0-20160111001536-1504d7f5a034
 )
 
 require (
