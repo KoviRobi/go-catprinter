@@ -59,3 +59,5 @@ tinygo.org/x/bluetooth v0.12.0 h1:ztrLZfhcZsmzdpir7lBKNz+Q5Wbd6ZdUB98sYLhXWhw=
 tinygo.org/x/bluetooth v0.12.0/go.mod h1:6+y5kVUN6tU7wtJj+qrcFJEVhas4/bIDhGNqvENmT74=
 honnef.co/go/cups v0.0.0-20160111001536-1504d7f5a034 h1:yB4jExzUgzi6ZKVQY4PpIzVLO8pztpvnOe5hg5AyUFA=
 honnef.co/go/cups v0.0.0-20160111001536-1504d7f5a034/go.mod h1:Uaju5Ze4fEwM0ycvzCJMniloMeopJU4dladn5Zoh0dM=
+tinygo.org/x/bluetooth v0.12.0 h1:ztrLZfhcZsmzdpir7lBKNz+Q5Wbd6ZdUB98sYLhXWhw=
+tinygo.org/x/bluetooth v0.12.0/go.mod h1:6+y5kVUN6tU7wtJj+qrcFJEVhas4/bIDhGNqvENmT74=
