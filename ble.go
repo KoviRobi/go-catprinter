@@ -2,11 +2,13 @@ package catprinter
 
 import (
 	"context"
-	"github.com/go-ble/ble"
-	"github.com/pkg/errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
+	"tinygo.org/x/bluetooth"
 )
 
 // For some reason, bleak reports the 0xaf30 service on my macOS, while it reports
@@ -43,8 +45,8 @@ func (c *Client) writeData(data []byte) error {
 	chunks := chunkify(data, c.chunkSize)
 	c.log("Sending %d chunks of size %d...", len(chunks), c.chunkSize)
 	for i, chunk := range chunks {
-		err := c.printer.WriteCharacteristic(c.characteristic, chunk, true)
-		if err != nil {
+		n, err := c.characteristic.WriteWithoutResponse(chunk)
+		if err != nil || n == 0 {
 			return errors.Wrap(err, "writing to characteristic, chunk "+strconv.Itoa(i))
 		}
 		time.Sleep(waitAfterEachChunkS)
@@ -63,20 +65,20 @@ func (c *Client) ScanDevices(name string) (map[string]string, error) {
 
 	c.log("Looking for a BLE device named %s", name)
 
-	ctx := ble.WithSigHandler(context.WithTimeout(context.Background(), c.Timeout))
+	adapter := bluetooth.DefaultAdapter
 
-	err := ble.Scan(ctx, true, func(a ble.Advertisement) {
-		if strings.Contains(strings.Join(found, " "), a.Addr().String()) {
+	err := adapter.Scan(func(adapter *bluetooth.Adapter, device bluetooth.ScanResult) {
+		if strings.Contains(strings.Join(found, " "), device.Address.String()) {
 			return
 		}
-		found = append(found, a.Addr().String())
-		if strings.Contains(strings.ToLower(a.LocalName()), strings.ToLower(name)) {
-			devices[a.Addr().String()] = a.LocalName()
-			c.log("Matches  %s %s", a.Addr().String(), a.LocalName())
+		found = append(found, device.Address.String())
+		if strings.Contains(strings.ToLower(device.LocalName()), strings.ToLower(name)) {
+			devices[device.Address.String()] = device.LocalName()
+			c.log("Matches  %s %s", device.Address.String(), device.LocalName())
 			return
 		}
-		c.log("No match %s %s", a.Addr().String(), a.LocalName())
-	}, nil)
+		c.log("No match %s %s", device.Address.String(), device.LocalName())
+	})
 
 	switch errors.Cause(err) {
 	case nil:
@@ -96,28 +98,49 @@ func (c *Client) ScanDevices(name string) (map[string]string, error) {
 }
 
 // Connect establishes a BLE connection to a printer by MAC address.
-func (c *Client) Connect(mac string) error {
-
-	ctx := ble.WithSigHandler(context.WithTimeout(context.Background(), c.Timeout))
-	connect, err := ble.Dial(ctx, ble.NewAddr(mac))
+func (c *Client) Connect(macString string) error {
+	var params bluetooth.ConnectionParams
+	mac, err := bluetooth.ParseMAC(macString)
+	if err != nil {
+		return fmt.Errorf("Bad MAC address: %w", err)
+	}
+	address := bluetooth.Address{MACAddress: bluetooth.MACAddress{MAC: mac}}
+	connect, err := c.adapter.Connect(address, params)
 	if err != nil {
 		return err
 	}
 
-	profile, err := connect.DiscoverProfile(true)
+	var services []bluetooth.DeviceService
+	for _, uuid := range possibleServiceUuids {
+		parsed, err := bluetooth.ParseUUID(uuid)
+		if err != nil {
+			return fmt.Errorf("Bad BLE UUID: %s; %w\n", uuid, err)
+		}
+		services, err = connect.DiscoverServices([]bluetooth.UUID{parsed})
+		if err == nil {
+			break
+		}
+	}
 	if err != nil {
-		return errors.Wrap(err, "discovering profile")
+		return errors.Wrap(err, "discovering services")
 	}
 
-	var char *ble.Characteristic
-	for _, service := range profile.Services {
-		c.log("service %s", service.UUID.String())
-		for _, characteristic := range service.Characteristics {
-			c.log("  %s", characteristic.UUID.String())
-			if characteristic.UUID.Equal(ble.MustParse(txCharacteristicUuid)) &&
-				strings.Contains(strings.Join(possibleServiceUuids, " "), service.UUID.String()) {
+	var char *bluetooth.DeviceCharacteristic
+	txCharacteristic, err := bluetooth.ParseUUID(txCharacteristicUuid)
+	if err != nil {
+		return fmt.Errorf("Bad BLE UUID: %s; %w\n", txCharacteristicUuid, err)
+	}
+	for _, service := range services {
+		c.log("service %s", service.UUID().String())
+		chars, err := service.DiscoverCharacteristics([]bluetooth.UUID{txCharacteristic})
+		if err != nil {
+			return fmt.Errorf("Failed to discover characteristics: %w", err)
+		}
+		for _, characteristic := range chars {
+			c.log("  %s", characteristic.UUID().String())
+			if characteristic.UUID() == txCharacteristic {
 				c.log("    found characteristic!")
-				char = characteristic
+				char = &characteristic
 				break
 			}
 		}
@@ -127,9 +150,14 @@ func (c *Client) Connect(mac string) error {
 		return ErrMissingCharacteristic
 	}
 
+	mtu, err := char.GetMTU()
+	if err != nil {
+		return fmt.Errorf("Failed to get MTU: %w", err)
+	}
+
 	c.characteristic = char
-	c.printer = connect
-	c.chunkSize = c.printer.Conn().RxMTU() - 3
+	c.printer = &connect
+	c.chunkSize = int(mtu) - 3
 	return nil
 
 }

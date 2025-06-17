@@ -1,14 +1,14 @@
 package catprinter
 
 import (
-	"github.com/disintegration/imaging"
-	"github.com/go-ble/ble"
-	"github.com/go-ble/ble/examples/lib/dev"
-	"github.com/pkg/errors"
 	"image"
 	"log"
 	"os"
 	"time"
+
+	"github.com/disintegration/imaging"
+	"github.com/pkg/errors"
+	"tinygo.org/x/bluetooth"
 )
 
 var (
@@ -20,9 +20,9 @@ var (
 
 // Client contains information for the connection to the printer and debugging options.
 type Client struct {
-	device         ble.Device
-	printer        ble.Client
-	characteristic *ble.Characteristic
+	adapter        *bluetooth.Adapter
+	printer        *bluetooth.Device
+	characteristic *bluetooth.DeviceCharacteristic
 	chunkSize      int
 	Timeout        time.Duration
 	Debug          struct {
@@ -35,18 +35,18 @@ type Client struct {
 
 // NewClient initiates a new client with sane defaults
 func NewClient() (*Client, error) {
-	d, err := dev.DefaultDevice()
+	d := bluetooth.DefaultAdapter
+	err := d.Enable()
 	if err != nil {
-		return nil, errors.Wrap(err, "can't create device, superuser permissions might be needed")
+		return nil, err
 	}
 	return NewClientFromDevice(d)
 }
 
 // NewClientFromDevice initiates a new client with a custom ble.Device and sane defaults
-func NewClientFromDevice(d ble.Device) (*Client, error) {
+func NewClientFromDevice(a *bluetooth.Adapter) (*Client, error) {
 	var c = &Client{}
-	ble.SetDefaultDevice(d)
-	c.device = d
+	c.adapter = a
 	c.Timeout = scanTimeout
 	return c, nil
 }
@@ -56,13 +56,13 @@ func (c *Client) Stop() error {
 	if err := c.Disconnect(); err != nil {
 		return errors.Wrap(err, "can't disconnect printer")
 	}
-	return c.device.Stop()
+	return nil
 }
 
 // Disconnect closes any active connection to a printer
 func (c *Client) Disconnect() error {
 	if c.printer != nil {
-		if err := c.printer.CancelConnection(); err != nil {
+		if err := c.printer.Disconnect(); err != nil {
 			return err
 		}
 		c.printer = nil
