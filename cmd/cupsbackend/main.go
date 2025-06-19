@@ -7,6 +7,8 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/makeworld-the-better-one/dither/v2"
+
 	"git.massivebox.net/massivebox/go-catprinter"
 
 	"honnef.co/go/cups/raster"
@@ -26,7 +28,7 @@ const (
 	CUPS_BACKEND_RETRY_CURRENT int = 7 // Job failed, retry this job immediately
 )
 
-func print(mac string) error {
+func print(mac string, dithering string) error {
 
 	d, err := raster.NewDecoder(os.Stdin)
 	if err != nil {
@@ -47,6 +49,21 @@ func print(mac string) error {
 		SetFill(true).
 		SetAutoRotate(false).
 		SetBlackPoint(0.5)
+
+	switch dithering {
+	case "None": opts = opts.SetDither(false)
+	case "Simple2D": opts = opts.SetDitherAlgo(dither.Simple2D)
+	case "FloydSteinberg": opts = opts.SetDitherAlgo(dither.FloydSteinberg)
+	case "FalseFloydSteinberg": opts = opts.SetDitherAlgo(dither.FalseFloydSteinberg)
+	case "JarvisJudiceNinke": opts = opts.SetDitherAlgo(dither.JarvisJudiceNinke)
+	case "Atkinson": opts = opts.SetDitherAlgo(dither.Atkinson)
+	case "Stucki": opts = opts.SetDitherAlgo(dither.Stucki)
+	case "Burkes": opts = opts.SetDitherAlgo(dither.Burkes)
+	case "Sierra": opts = opts.SetDitherAlgo(dither.Sierra)
+	case "TwoRowSierra": opts = opts.SetDitherAlgo(dither.TwoRowSierra)
+	case "SierraLite": opts = opts.SetDitherAlgo(dither.SierraLite)
+	case "StevenPigeon": opts = opts.SetDitherAlgo(dither.StevenPigeon)
+	}
 
 	fmt.Println("INFO: Connecting...")
 	err = c.Connect(mac)
@@ -121,12 +138,14 @@ func main() {
 	}
 	fmt.Printf("ERROR: Printing to MAC %s\n", mac)
 
+	dither := os.Getenv("Dither")
+
 	fmt.Printf(
 		"ERROR: Job ID %s User %s Title %s Copies %s Options %s File %s\n",
 		jobId, user, title, copies, options, file,
 	)
 
-	if err := print(mac); err != nil {
+	if err := print(mac, dither); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -52,6 +52,21 @@ Group "BlankGroup/Blank Options"
     Choice "True/Print" "<</cupsInteger6 1>>setpagedevice"
    *Choice "False/None" "<</cupsInteger6 0>>setpagedevice"
 
+Group "ImageGroup/Image Conversion Options"
+  Option "Dither/Dithering Algorithm" PickOne AnySetup 10
+    Choice "None/None (don't dither)" ""
+    Choice "Simple2D/Simple 2D" ""
+   *Choice "FloydSteinberg/Floyd-Steinberg" ""
+    Choice "FalseFloydSteinberg/False Floyd-Steinberg" ""
+    Choice "JarvisJudiceNinke/Jarvis-Judice-Ninke" ""
+    Choice "Atkinson/Atkinson" ""
+    Choice "Stucki/Stucki" ""
+    Choice "Burkes/Burkes" ""
+    Choice "Sierra/Sierra (also known as Sierra3)" ""
+    Choice "TwoRowSierra/Two-row Sierra (also known as Sierra2)" ""
+    Choice "SierraLite/Sierra-lite (Also known as Sierra2-4A)" ""
+    Choice "StevenPigeon/StevenPigeon" ""
+
 // 58mm printers
 {
   #define POINTS 164
