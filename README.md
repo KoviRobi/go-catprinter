@@ -54,7 +54,7 @@ Android app. The code is a bit more cluttered, but it works well.
 - [rbaron/catprinter](https://github.com/rbaron/catprinter) - simple CLI
 application for cat printers with batteries included, written in Python with
 code that's easy to understand.
-- [NaitLee/kitty-printer](NaitLee/kitty-printer) - a web app for cat printers
-which leverages Web Bluetooth
-- [jhbruhn/catprint-rs](jhbruhn/catprint-rs) - a driver for cat printers with a
-basic CLI utility, written in Rust
+- [NaitLee/kitty-printer](https://github.com/NaitLee/kitty-printer) - a web app
+for cat printers which leverages Web Bluetooth
+- [jhbruhn/catprint-rs](https://github.com/jhbruhn/catprint-rs) - a driver for
+cat printers with a basic CLI utility, written in Rust
