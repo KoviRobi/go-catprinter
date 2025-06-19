@@ -26,7 +26,7 @@ jobs:
 
     - name: Build
       run: |
-        GOOS=${{matrix.os}} GOARCH=${{matrix.arch}} go build -o build/${{matrix.os}}/catprinter -v ./cli/main.go
+        GOOS=${{matrix.os}} GOARCH=${{matrix.arch}} go build -o build/${{matrix.os}}/ -v ./cmd/...
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
